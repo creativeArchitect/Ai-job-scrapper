@@ -30,7 +30,7 @@ model ScrapedJob {
   postPlatform String
 
   // AI / Analytics Fields
-  aiScore         Float?
+  // aiScore         Float?
   experienceLevel String?
   position        String?
 

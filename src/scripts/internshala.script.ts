@@ -12,13 +12,19 @@ const internshalaScrapper = async ()=> {
         const page = await browser.newPage();
     
         await page.goto(`https://internshala.com/jobs`)      // jobType format -> Ex. "full-stack-development"
+
+        let jobs: any = [];
     
-        const job = await page.$$eval('', (cards)=> {
-            console.log("cards of internshala: ", cards);
-        })
+        const job = await page.$$eval('internship_meta', (cards)=> {
+            jobs = [...cards];
+        });
+
+        console.log("job:", job);
     
         await browser.close();
         console.log("✅ Scraping completed for Internshala");
+
+        return jobs;
     } catch(err){
         console.log("Error in the internshala scrapper");
     }

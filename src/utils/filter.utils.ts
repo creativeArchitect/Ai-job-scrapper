@@ -49,7 +49,7 @@ try {
         temperature: 0,
     })
 
-    const output = response.choices[0].message.content; 
+    const output: any = response.choices[0].message.content; 
 
     //  try to parse the JSON
     try {

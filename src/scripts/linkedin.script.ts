@@ -13,6 +13,8 @@ const linkedinScrapper = async ()=> {
 
         await page.goto(``);
 
+        let jobs: any = [];
+
         const job = await page.$$eval('', (cards)=> {
             // cards.map((c)=> {
             //     title: c.querySelector('')?.innerText.trim(),
@@ -24,10 +26,16 @@ const linkedinScrapper = async ()=> {
             // })
 
             console.log("cards of linkedin: ", cards);
+
+            jobs = [...cards];
         })
+
+        console.log("job:", job);
+
         await browser.close();
         console.log("✅ Scraping completed for Linkedin");
 
+        return jobs;
     } catch(err){
         console.log("Error in the linkedin scrapper");
     }
