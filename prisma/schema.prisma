@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ScrapedJob {
+  id String @id @default(uuid())
+
+  // Basic Info
+  title       String
+  description String
+  companyName String
+  location    String?
+  minSalary   String?
+  maxSalary   String?
+  fixedSalary String?
+
+  // Eligibility / Requirements
+  eligibleYear String?
+  requiredExp  String?
+  skills       String[]
+
+  // Job Link & Source
+  jobUrl       String @unique
+  postPlatform String
+
+  // AI / Analytics Fields
+  aiScore         Float?
+  experienceLevel String?
+  position        String?
+
+  // Dates
+  postedAt  DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([postPlatform, createdAt])
+}
