@@ -4,7 +4,7 @@ import { PrismaClient } from "../generated/prisma";
 
 const prisma = new PrismaClient();
 
-const linkedinScrapper = async (jobType: string)=> {
+const linkedinScrapper = async ()=> {
     try{
         const browser = await chromium.launch({
             headless: true
@@ -14,18 +14,24 @@ const linkedinScrapper = async (jobType: string)=> {
         await page.goto(``);
 
         const job = await page.$$eval('', (cards)=> {
-            cards.map((c)=> {
-                title: c.querySelector('')?.innerText.trim(),
-                companyName: c.querySelector('')?.innerText.trim(),
-                location: c.querySelector('')?.innerText.trim(),
-                jobUrl: c.querySelector('')?.innerText.trim(),
-                source: c.querySelector('')?.innerText.trim(),
-                description: c.querySelector('')?.innerText.trim()
-            })
+            // cards.map((c)=> {
+            //     title: c.querySelector('')?.innerText.trim(),
+            //     companyName: c.querySelector('')?.innerText.trim(),
+            //     location: c.querySelector('')?.innerText.trim(),
+            //     jobUrl: c.querySelector('')?.innerText.trim(),
+            //     source: c.querySelector('')?.innerText.trim(),
+            //     description: c.querySelector('')?.innerText.trim()
+            // })
+
+            console.log("cards of linkedin: ", cards);
         })
+        await browser.close();
+        console.log("✅ Scraping completed for Linkedin");
 
     } catch(err){
-
+        console.log("Error in the linkedin scrapper");
     }
 }
+
+export default linkedinScrapper;
 
