@@ -18,7 +18,7 @@ model ScrapedJob {
   location    String?
   minSalary   String?
   maxSalary   String?
-  salary      String?
+  fixedSalary      String?
 
   // Eligibility / Requirements
   eligibleYear String?

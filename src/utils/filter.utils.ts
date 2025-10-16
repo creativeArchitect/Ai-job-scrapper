@@ -10,7 +10,7 @@ You are an AI assistant that processes an array of raw job data objects and retu
 
  and also make sure that you remove all the **/n** in the content because i will store the filtered data in the db for the reference.
 
- if salary like this '₹ 2,00,000 - 2,25,000' this exists at that time you assume first value like example 2,00,000 as minSalary and second value like for example 2,25,000 assume maxSalary if only one value exists and minSalary and maxSalary will be the value
+ if fixedsalary or salary like this '₹ 2,00,000 - 2,25,000' this exists at that time you assume first value like example 2,00,000 as minSalary and second value like for example 2,25,000 assume maxSalary if only one value exists and minSalary and maxSalary will be the value
 
 Your task is to return an array of valid JSON objects that strictly match the schema below. Respond **only** with the raw JSON array — no markdown, no code blocks, no explanations.
 
