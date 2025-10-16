@@ -2,74 +2,73 @@ import scrapeJobHTMLs from "@/scripts/scrapper";
 import analyzeJobs from "@/utils/filter.utils";
 import { Request, Response, NextFunction } from "express";
 
-export const sendInternshalaJobPost = async (
+export const sendJobPostToAi = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const url = "https://internshala.com/jobs";
-    const selector = ".individual_internship";
+    const platform = req.params.platform;
 
-    const htmlArray = await scrapeJobHTMLs(url, selector, 5);
+    if (platform === "internshala") {
+      const url = "https://internshala.com/jobs";
 
-    const result = await analyzeJobs(htmlArray, "internshala");
+      const internshalaPlatformSelector = {
+        container: ".individual_internship",
+        title: ".job-title-href",
+        description: ".about_job .text",
+        companyName: ".company-name",
+        location: ".locations",
+        salary: ".row-1-item i.ic-16-money + span",
+        experience: ".row-1-item i.ic-16-briefcase + span",
+        skills: ".job_skills .job_skill",
+        jobUrl: ".job-title-href",
+      };
 
-    console.log("result: ", result);
+      const scrappedHtmlArr = await scrapeJobHTMLs(
+        url,
+        internshalaPlatformSelector,
+        5,
+        platform
+      );
+      
+      console.log("scrapped jobs:", scrappedHtmlArr);
 
+      const aiResponseOutput = await analyzeJobs(scrappedHtmlArr, platform);
+
+      console.log("analyzed ai output of job: ", aiResponseOutput);
+
+    } else if (platform === "cuvette") {
+      const url = "https://internshala.com/jobs";
+
+      const cuvettePlatformSelector = {
+        container: "",
+        title: ".job-title-href",
+        description: ".about_job .text",
+        companyName: ".company-name",
+        location: ".locations",
+        salary: ".row-1-item i.ic-16-money + span",
+        experience: ".row-1-item i.ic-16-briefcase + span",
+        skills: ".job_skills .job_skill",
+        jobUrl: ".job-title-href",
+      };
+
+      const scrappedHtmlArr = await scrapeJobHTMLs(
+        url,
+        cuvettePlatformSelector,
+        10,
+        platform
+      );
+
+      const aiResponseOutput = await analyzeJobs(scrappedHtmlArr, platform);
+
+      console.log("analyzed job: ", aiResponseOutput);
+    }
   } catch (err) {
     console.error("Error in getting scrapped jobs:", err);
     return res.status(500).json({
       success: false,
       message: err instanceof Error ? err.message : "Unknown error",
-    });
-  }
-};
-
-export const sendCuvetteJobPost = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    // const linkedinJobsHTML = await linkedinScrapper();
-    // if(!linkedinJobsHTML){
-    //     return res.status(404).json({
-    //         success: false,
-    //         message: "linkedin scrapped jobs detail not found"
-    //     })
-    // }
-
-    // const aiGenLinkedinFetauredJobs = await analyzeJobs(linkedinJobsHTML, "linkedin");
-
-    // if(!aiGenLinkedinFetauredJobs){
-    //     return res.status(404).json({
-    //         success: false,
-    //         message: "ai gen linkedin scrapped jobs detail not found"
-    //     })
-    // }
-
-    // res.status(200).json({
-    //     success: true,
-    //     message: "filtered job details got successfully",
-    //     data: aiGenLinkedinFetauredJobs
-    // })
-
-    const url = "https://cuvette.tech/jobs";
-    const selector = ".individual_internship";
-
-    const htmlArray = await scrapeJobHTMLs(url, selector, 5);
-
-    // console.log(htmlArray.length, "jobs scraped!");
-    // console.log(htmlArray[0]);
-
-    console.log("htmlArray: ", htmlArray);
-  } catch (err) {
-    console.log("error in the getting scrapped jobs");
-
-    return res.status(500).json({
-      success: false,
-      message: "Error in getting the scrapped jobs",
     });
   }
 };
