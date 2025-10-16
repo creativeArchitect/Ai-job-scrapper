@@ -1,6 +1,6 @@
 import { JobData } from "@/types/job.types";
 import { chromium } from "playwright";
-
+import fs from 'fs'
 const scrapeJobHTMLs = async (
   url: string,
   jobSelectorObj: any,
@@ -25,7 +25,9 @@ const scrapeJobHTMLs = async (
 
   await page.waitForSelector(jobSelectorObj.container); //  wait for the job container
 
-  await autoScroll(page); // Scroll to load more jobs (if infinite scrolling)
+  await loadJobs(page, jobSelectorObj, maxJobs);
+  await page.waitForTimeout(2000); // give time for dynamic content to load
+  
 
   //  $$eval cannot return the as we want because it implicity returns void
 
@@ -61,27 +63,62 @@ console.log("Cards found:", cardCount);
     }
   );
   
+  await fs.writeFile('output.txt', JSON.stringify(jobs), (err) => {
+    if (err) throw err;
+    console.log('Data appended successfully!');
+  });
+
   await browser.close();
   return jobs;
 };
 
+const loadByScrolling = async (page: any, jobSelectorObj: any, maxJobs: number) => {
+  let jobCount = 0;
+  let tries = 0;
 
-const autoScroll = async (page: any) => {
-  await page.evaluate(async () => {
-    await new Promise<void>((resolve) => {
-      let totalHeight = 0;
-      const distance = 500;
-      const timer = setInterval(() => {
-        window.scrollBy(0, distance);
-        totalHeight += distance;
-
-        if (totalHeight >= document.body.scrollHeight) {
-          clearInterval(timer);
-          resolve();
-        }
-      }, 300);
-    });
-  });
+  while (jobCount < maxJobs && tries < 10) {
+    await page.evaluate(() => window.scrollBy(0, window.innerHeight * 2));
+    await page.waitForTimeout(2000); // Wait for lazy load
+    jobCount = await page.$$eval(jobSelectorObj.container, (els) => els.length);
+    console.log(`Scrolled... Found ${jobCount} jobs`);
+    tries++;
+  }
 };
+
+const loadByPagination = async (page: any, jobSelectorObj: any, maxJobs: number) => {
+  let jobCount = 0;
+  let pageCount = 0;
+
+  while (jobCount < maxJobs && pageCount < 10) {
+    await page.waitForTimeout(2000);
+
+    jobCount = await page.$$eval(jobSelectorObj.container, (els: any) => els.length);
+    console.log(`Page ${pageCount + 1}: Found ${jobCount} jobs`);
+
+    // Click the next button if it exists and is enabled
+    const hasNext = await page.$(jobSelectorObj.nextButton);
+    if (!hasNext) break;
+
+    const isDisabled = await page.$eval(jobSelectorObj.nextButton, (btn: any) => btn.disabled || btn.classList.contains("disabled"));
+    if (isDisabled) break;
+
+    await hasNext.click();
+    await page.waitForTimeout(3000);
+    pageCount++;
+  }
+};
+
+
+const loadJobs = async (page: any, jobSelectorObj: any, maxJobs: number) => {
+  if (jobSelectorObj.loadType === "scroll") {
+    await loadByScrolling(page, jobSelectorObj, maxJobs);
+  } else if (jobSelectorObj.loadType === "pagination") {
+    await loadByPagination(page, jobSelectorObj, maxJobs);
+  } else {
+    console.warn("Unknown loadType. Defaulting to scroll.");
+    await loadByScrolling(page, jobSelectorObj, maxJobs);
+  }
+};
+
 
 export default scrapeJobHTMLs;

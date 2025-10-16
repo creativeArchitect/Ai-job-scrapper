@@ -29,9 +29,6 @@ model ScrapedJob {
   jobUrl       String @unique
   postPlatform String
 
-  // AI / Analytics Fields
-  // aiScore         Float?
-  experienceLevel String?
   position        String?
 
   // Dates

@@ -1,5 +1,6 @@
 import scrapeJobHTMLs from "@/scripts/scrapper";
-import analyzeJobs from "@/utils/filter.utils";
+import analyzeJobs from "@/utils/ai.utils";
+import { chunkingData } from "@/utils/filter.utils";
 import { Request, Response, NextFunction } from "express";
 
 export const sendJobPostToAi = async (
@@ -12,6 +13,7 @@ export const sendJobPostToAi = async (
 
     if (platform === "internshala") {
       const url = "https://internshala.com/jobs";
+      const limit = 52;
 
       const internshalaPlatformSelector = {
         container: ".individual_internship",
@@ -23,18 +25,22 @@ export const sendJobPostToAi = async (
         experience: ".row-1-item i.ic-16-briefcase + span",
         skills: ".job_skills .job_skill",
         jobUrl: ".job-title-href",
+        loadType: "pagination",
+        nextButton: ".next-page" 
       };
 
       const scrappedHtmlArr = await scrapeJobHTMLs(
         url,
         internshalaPlatformSelector,
-        5,
+        limit,
         platform
       );
-      
-      console.log("scrapped jobs:", scrappedHtmlArr);
 
-      const aiResponseOutput = await analyzeJobs(scrappedHtmlArr, platform);
+      const jobChunks = chunkingData(scrappedHtmlArr, 10); 
+
+      console.log("chunks jobs:", jobChunks);
+
+      const aiResponseOutput = await analyzeJobs(jobChunks, platform);
 
       console.log("analyzed ai output of job: ", aiResponseOutput);
 
