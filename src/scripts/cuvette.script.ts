@@ -15,16 +15,7 @@ const linkedinScrapper = async ()=> {
 
         let jobs: any = [];
 
-        const job = await page.$$eval('', (cards)=> {
-            // cards.map((c)=> {
-            //     title: c.querySelector('')?.innerText.trim(),
-            //     companyName: c.querySelector('')?.innerText.trim(),
-            //     location: c.querySelector('')?.innerText.trim(),
-            //     jobUrl: c.querySelector('')?.innerText.trim(),
-            //     source: c.querySelector('')?.innerText.trim(),
-            //     description: c.querySelector('')?.innerText.trim()
-            // })
-
+        const job = await page.$$eval('.jobs-search__results-list li', (cards)=> {
             console.log("cards of linkedin: ", cards);
 
             jobs = [...cards];

@@ -1,10 +1,10 @@
-import { sendInternshalaJobPost,sendLinkedinJobPost } from "@/controller/filter.controller";
+import { sendInternshalaJobPost,sendCuvetteJobPost } from "@/controller/filter.controller";
 import { Router } from "express";
 
 const filterJobRouter = Router();
 
-filterJobRouter.post('/internshala/jobs', sendInternshalaJobPost);
-filterJobRouter.post('/linkedin/jobs', sendLinkedinJobPost);
+filterJobRouter.get('/internshala/jobs', sendInternshalaJobPost);
+filterJobRouter.get('/linkedin/jobs', sendCuvetteJobPost);
 
 
 

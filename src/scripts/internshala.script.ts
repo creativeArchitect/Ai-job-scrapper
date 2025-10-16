@@ -15,7 +15,7 @@ const internshalaScrapper = async ()=> {
 
         let jobs: any = [];
     
-        const job = await page.$$eval('internship_meta', (cards)=> {
+        const job = await page.$$eval('.internship_meta', (cards)=> {
             jobs = [...cards];
         });
 
